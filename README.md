@@ -8,9 +8,10 @@ Run FIFA Soccer 2003 in a desktop browser using a Windows host. Boxedwine runs t
 - Caddy on the Windows host for LAN play. Install it on your PATH or use a portable executable. [Install Caddy](https://caddyserver.com/docs/install)
 
 ## TL;DR
-1. Edit fifa-host.cfg
-2. Launch prepare.py to install everything
-3. Run host.py to launch server
+
+1. Edit `fifa-host.cfg`
+2. Run `python prepare.py` to download Boxedwine and package the game ahead of time
+3. Run `python host.py` to prepare the game and launch the server
 4. ...
 5. PROFIT!!
 
@@ -30,6 +31,14 @@ caddy_path =
 - `game_dir` is the installed game folder. Absolute paths and paths relative to the configuration file both work.
 - `lan_ip` is the Windows host's IPv4 address on the same network as the client. Leave it blank to play on the host itself. Also you can use VLAN tools like Hamachi, ZeroTier, etc. to create a virtual LAN and play over the Internet
 - `caddy_path` can point to a portable `caddy.exe`. Leave it blank to find Caddy on PATH.
+
+To download the Boxedwine browser runtime and package the game without starting the server, open PowerShell in the repository and run this command.
+
+```powershell
+python prepare.py
+```
+
+Note: `python host.py` runs the same preparation before starting the server and reuses verified Boxedwine files from an earlier run. But better to download and install Boxedwine beforehand
 
 ## 2. Start the host
 

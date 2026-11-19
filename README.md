@@ -52,7 +52,9 @@ python host.py
 
 The script packages FIFA, downloads the pinned Boxedwine runtime when needed, and starts Node. When `lan_ip` is set, it also starts Caddy and prints the HTTPS address and public certificate path. Leave the PowerShell window open while playing. Press **Ctrl+C** to stop the host.
 
-If the Boxedwine files move, update `runtime_url` or `filesystem_url` in the `[boxedwine]` section of `fifa-host.cfg`. A mirror of the same files works with the existing [runtime-lock.json](runtime-lock.json). A different Boxedwine release needs a matching lockfile and a compatibility check.
+<img width="1213" height="463" alt="image" src="https://github.com/user-attachments/assets/83792673-a7d8-4b4f-84c3-7993d3346df2" />
+
+If the Boxedwine files at boxedwine.org move or URL changes completely - update `runtime_url` or `filesystem_url` in the `[boxedwine]` section of `fifa-host.cfg`. A mirror of the same files works with the existing [runtime-lock.json](runtime-lock.json). A different Boxedwine release needs a matching lockfile and a compatibility check.
 
 For play on the host itself, open <http://127.0.0.1:8325/>. If you already have a FIFA host running, stop it before starting this one so the ports are available.
 
@@ -71,10 +73,16 @@ On Linux, macOS, or Windows, use a Chromium-based browser such as Chrome, Chromi
 ## 4. Play a friendly
 
 1. Click inside the game and press Enter at the title screen. Press a face button on your gamepad and check that its name appears above the game.
+<img width="1280" height="800" alt="photo_2026-11-19_08-40-36" src="https://github.com/user-attachments/assets/e9bfd199-94ed-4e65-b15f-fd5d25eba332" />
 2. Use the mouse to select **Play a Club Championship Friendly**. At **Select Sides**, use the keyboard arrows and the gamepad's left stick or D-pad to assign the two device icons. The launcher supports one browser gamepad plus the keyboard.
 3. Start the match. Use the arrow keys to move, **S** to pass, **A** for a long ball, **D** to shoot, **W** to cross, and **Esc** to pause. See **Control Options** for the gamepad mappings.
 
+<img width="1280" height="800" alt="photo_2026-11-19_08-40-58" src="https://github.com/user-attachments/assets/30929fca-af7b-4450-bda4-f6b0f37d3e17" />
+
+
 If the game is choppy, check WebGL hardware acceleration at `chrome://gpu` or `edge://gpu`.
+
+
 
 ## Controller files
 

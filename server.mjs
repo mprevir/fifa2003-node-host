@@ -44,7 +44,7 @@ if (positional.length > 2) {
 
 const rootInfo = await stat(root).catch(() => null);
 if (!rootInfo?.isDirectory()) {
-    console.error(`Game package directory unavailable: ${root}. Run python host.py to prepare and serve FIFA.`);
+    console.error(`Game package directory unavailable: ${root}. Run python prepare.py first.`);
     process.exit(1);
 }
 

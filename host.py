@@ -1,4 +1,4 @@
-"""Prepare and serve FIFA on the Windows host."""
+"""Serve the prepared FIFA files on the Windows host."""
 import configparser
 import os
 import shutil
@@ -8,7 +8,7 @@ from contextlib import ExitStack
 from ipaddress import IPv4Address
 from pathlib import Path
 
-from prepare import HERE, configured_path, prepare, read_settings
+from prepare import HERE, LOCK, WEB_FILES, configured_path, read_settings
 
 
 def executable(name, path=""):
@@ -41,6 +41,10 @@ def stop(process):
 def main():
     settings = read_settings()
     host_settings = settings["host"]
+    required_files = (*LOCK["runtime"], "boxedwine.zip", "fifa325-pad.zip", "fifa.html", "index.html", "gamepad.js")
+    if any(not (WEB_FILES / name).is_file() for name in required_files):
+        raise ValueError("Prepared game files are missing. Run python prepare.py before starting the host.")
+
     node = executable("node")
     lan_ip = host_settings.get("lan_ip", "").strip()
     if lan_ip:
@@ -54,7 +58,6 @@ def main():
         env = {**os.environ, "FIFA_LAN_IP": str(address)}
         certificate = certificate_path(caddy, env)
 
-    prepare(settings)
     with ExitStack() as processes:
         origin = subprocess.Popen([node, "server.mjs"], cwd=HERE)
         processes.callback(stop, origin)

@@ -10,8 +10,8 @@ Run FIFA Soccer 2003 in a desktop browser using a Windows host. Boxedwine runs t
 ## TL;DR
 
 1. Edit `fifa-host.cfg`
-2. Run `python prepare.py` to download Boxedwine and package the game ahead of time
-3. Run `python host.py` to prepare the game and launch the server
+2. Run `python prepare.py` once to download Boxedwine and package the game
+3. Run `python host.py` whenever you want to start the server
 4. ...
 5. PROFIT!!
 
@@ -40,7 +40,7 @@ To download the Boxedwine browser runtime and package the game without starting 
 python prepare.py
 ```
 
-Note: `python host.py` runs the same preparation before starting the server and reuses verified Boxedwine files from an earlier run. But better to download and install Boxedwine beforehand
+Run `python prepare.py` again if you change the game files or the Boxedwine runtime.
 
 ## 2. Start the host
 
@@ -50,7 +50,7 @@ Open PowerShell in the repository and run the host.
 python host.py
 ```
 
-The script packages FIFA, downloads the pinned Boxedwine runtime when needed, and starts Node. When `lan_ip` is set, it also starts Caddy and prints the HTTPS address and public certificate path. Leave the PowerShell window open while playing. Press **Ctrl+C** to stop the host.
+The script starts Node and serves the files created by `prepare.py`. When `lan_ip` is set, it also starts Caddy and prints the HTTPS address and public certificate path. Leave the PowerShell window open while playing. Press **Ctrl+C** to stop the host.
 
 <img width="1213" height="463" alt="image" src="https://github.com/user-attachments/assets/83792673-a7d8-4b4f-84c3-7993d3346df2" />
 
@@ -85,4 +85,4 @@ If the game is choppy, check WebGL hardware acceleration at `chrome://gpu` or `e
 
 ## Controller files
 
-[gamepad.js](gamepad.js) writes the first browser pad's state to the Boxedwine memory-backed D: drive. The bundled `xinput1_4.dll` reads it and Xidi presents it to FIFA as a separate DirectInput controller. To rebuild the custom DLL, run `controller\build.cmd` from an x86 Visual Studio Developer Command Prompt and restart the host. The bundled DLLs and their notices are under [controller/xidi](controller/xidi). [Xidi upstream release](https://github.com/samuelgr/Xidi/releases/tag/v5.0.0)
+[gamepad.js](gamepad.js) writes the first browser pad's state to the Boxedwine memory-backed D: drive. The bundled `xinput1_4.dll` reads it and Xidi presents it to FIFA as a separate DirectInput controller. To rebuild the custom DLL, run `controller\build.cmd` from an x86 Visual Studio Developer Command Prompt, then run `python prepare.py` before restarting the host. The bundled DLLs and their notices are under [controller/xidi](controller/xidi). [Xidi upstream release](https://github.com/samuelgr/Xidi/releases/tag/v5.0.0)

@@ -40,8 +40,9 @@ def stop(process):
 
 def main():
     settings = read_settings()
+    host_settings = settings["host"]
     node = executable("node")
-    lan_ip = settings.get("lan_ip", "").strip()
+    lan_ip = host_settings.get("lan_ip", "").strip()
     if lan_ip:
         try:
             address = IPv4Address(lan_ip)
@@ -49,7 +50,7 @@ def main():
             raise ValueError("Set lan_ip in fifa-host.cfg to the host's LAN IPv4 address.") from error
         if address.is_unspecified or address.is_multicast:
             raise ValueError("Set lan_ip in fifa-host.cfg to a specific interface address.")
-        caddy = executable("caddy", settings.get("caddy_path", "").strip())
+        caddy = executable("caddy", host_settings.get("caddy_path", "").strip())
         env = {**os.environ, "FIFA_LAN_IP": str(address)}
         certificate = certificate_path(caddy, env)
 

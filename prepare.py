@@ -15,17 +15,17 @@ WEB_FILES = HERE / ".fifa-runtime"
 CONTROLLER = HERE / "controller"
 XIDI = CONTROLLER / "xidi"
 LOCK = json.loads((HERE / "runtime-lock.json").read_text(encoding="utf-8"))
-BUILD = "https://boxedwine.org/builds/demos/build/master/138/st-jit/"
-EXCLUDE = {"d3d8.dll", "ddraw.dll", "dgvoodoo.conf"}
+# Leave native dgVoodoo overrides out of the game ZIP so Wine uses its own graphics libraries.
+DGVOODOO_OVERRIDES = {"d3d8.dll", "ddraw.dll", "dgvoodoo.conf"}
 
 
 def read_settings():
     parser = configparser.ConfigParser(interpolation=None)
     if not parser.read(CONFIG, encoding="utf-8-sig"):
-        raise ValueError("Copy fifa-host.example.cfg to fifa-host.cfg and set game_dir.")
+        raise ValueError("Could not read fifa-host.cfg. Restore the file from the repository and set game_dir.")
     if not parser.has_section("host"):
         raise ValueError("Add the [host] section to fifa-host.cfg.")
-    return parser["host"]
+    return parser
 
 
 def configured_path(value):
@@ -47,7 +47,7 @@ def fetch(name, url, pin):
         with urllib.request.urlopen(url, timeout=120) as response, partial.open("wb") as output:
             shutil.copyfileobj(response, output)
         if digest(partial) != pin:
-            raise ValueError(f"SHA-256 mismatch for {name}")
+            raise ValueError(f"SHA-256 mismatch for {name}: the download does not match runtime-lock.json.")
         partial.replace(path)
     finally:
         partial.unlink(missing_ok=True)
@@ -80,7 +80,7 @@ def pack_game(game):
     }
     for notice in sorted((XIDI / "ThirdParty").iterdir()):
         overlays[f"Xidi-licenses/{notice.name}"] = notice
-    excluded = EXCLUDE | {"soccer.ini"} | {name.lower() for name in overlays}
+    excluded = DGVOODOO_OVERRIDES | {"soccer.ini"} | {name.lower() for name in overlays}
     with NamedTemporaryFile(dir=WEB_FILES, delete=False) as temp:
         partial = Path(temp.name)
     try:
@@ -114,9 +114,14 @@ def write_launcher():
 
 
 def prepare(settings):
-    game_dir = settings.get("game_dir", "").strip()
+    game_dir = settings["host"].get("game_dir", "").strip()
     if not game_dir:
         raise ValueError("Set game_dir in fifa-host.cfg to the installed FIFA folder.")
+    runtime_url = settings.get("boxedwine", "runtime_url", fallback="").rstrip("/")
+    filesystem_url = settings.get("boxedwine", "filesystem_url", fallback="")
+    if not runtime_url or not filesystem_url:
+        raise ValueError("Set runtime_url and filesystem_url in the [boxedwine] section of fifa-host.cfg.")
+
     game = configured_path(game_dir)
     output = WEB_FILES.resolve()
     if output.is_relative_to(game) or game.is_relative_to(output):
@@ -126,9 +131,8 @@ def prepare(settings):
     print(f"Preparing FIFA from {game}", flush=True)
     pack_game(game)
     for name, metadata in LOCK["runtime"].items():
-        fetch(name, BUILD + name, metadata["sha256"])
-    fetch("boxedwine.zip", "https://boxedwine.org/v2/41/TinyCore15Wine11.0-web.zip",
-          LOCK["filesystem"]["archive"]["sha256"])
+        fetch(name, f"{runtime_url}/{name}", metadata["sha256"])
+    fetch("boxedwine.zip", filesystem_url, LOCK["filesystem"]["archive"]["sha256"])
     write_launcher()
 
 

@@ -11,13 +11,7 @@ Run FIFA Soccer 2003 in a desktop browser using a Windows host. Boxedwine runs t
 
 Build 235 of FIFA Soccer 2003 for PC is recommended. Use your own installation or download and install the PC release from the Internet Archive. Use the installed folder containing `fifa2003.exe`, `soccer.ini`, and the `data` directory, including the game audio. [FIFA Soccer 2003 at the Internet Archive](https://archive.org/details/fifa2003_multi7)
 
-In PowerShell, open the repository and copy the example configuration.
-
-```powershell
-Copy-Item .\fifa-host.example.cfg .\fifa-host.cfg
-```
-
-Edit `fifa-host.cfg`. For LAN play, find the IPv4 address of the Windows network adapter using `ipconfig`.
+Edit [fifa-host.cfg](fifa-host.cfg) in the repository. For LAN play, find the IPv4 address of the Windows network adapter using `ipconfig`.
 
 ```ini
 [host]
@@ -32,11 +26,15 @@ caddy_path =
 
 ## 2. Start the host
 
+Open PowerShell in the repository and run the host.
+
 ```powershell
 python host.py
 ```
 
 The script packages FIFA, downloads the pinned Boxedwine runtime when needed, and starts Node. When `lan_ip` is set, it also starts Caddy and prints the HTTPS address and public certificate path. Leave the PowerShell window open while playing. Press **Ctrl+C** to stop the host.
+
+If the Boxedwine files move, update `runtime_url` or `filesystem_url` in the `[boxedwine]` section of `fifa-host.cfg`. A mirror of the same files works with the existing [runtime-lock.json](runtime-lock.json). A different Boxedwine release needs a matching lockfile and a compatibility check.
 
 For play on the host itself, open <http://127.0.0.1:8325/>. If you already have a FIFA host running, stop it before starting this one so the ports are available.
 

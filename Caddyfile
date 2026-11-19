@@ -1,0 +1,19 @@
+{
+	admin off
+	persist_config off
+	auto_https disable_redirects
+	skip_install_trust
+	servers {
+		protocols h1 h2
+		listener_wrappers {
+			http_redirect
+			tls
+		}
+	}
+}
+
+https://{$FIFA_LAN_IP}:8443 {
+	bind {$FIFA_LAN_IP}
+	tls internal
+	reverse_proxy 127.0.0.1:8325
+}

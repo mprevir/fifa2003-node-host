@@ -7,6 +7,13 @@ Run FIFA Soccer 2003 in a desktop browser using a Windows host. Boxedwine runs t
 - Windows host with Node.js 24 or newer and Python 3.11 or newer.
 - Caddy on the Windows host for LAN play. Install it on your PATH or use a portable executable. [Install Caddy](https://caddyserver.com/docs/install)
 
+## TL;DR
+1. Edit fifa-host.cfg
+2. Launch prepare.py to install everything
+3. Run host.py to launch server
+4. ...
+5. PROFIT!!
+
 ## 1. Prepare the host files
 
 Build 235 of FIFA Soccer 2003 for PC is recommended. Use your own installation or download and install the PC release from the Internet Archive. Use the installed folder containing `fifa2003.exe`, `soccer.ini`, and the `data` directory, including the game audio. [FIFA Soccer 2003 at the Internet Archive](https://archive.org/details/fifa2003_multi7)

@@ -23,14 +23,16 @@ Edit [fifa-host.cfg](fifa-host.cfg) in the repository. For LAN play, find the IP
 
 ```ini
 [host]
-game_dir = D:\Games\FIFA 2003
-lan_ip = 192.168.1.50
+game_dir = D:/Games/FIFA 2003
+lan_ip = 192.168.20.3
 caddy_path =
 ```
 
 - `game_dir` is the installed game folder. Absolute paths and paths relative to the configuration file both work.
 - `lan_ip` is the Windows host's IPv4 address on the same network as the client. Leave it blank to play on the host itself. Also you can use VLAN tools like Hamachi, ZeroTier, etc. to create a virtual LAN and play over the Internet
 - `caddy_path` can point to a portable `caddy.exe`. Leave it blank to find Caddy on PATH.
+
+Replace the sample values with your own. Enter the IPv4 address by itself in `lan_ip`. The server adds HTTPS and port 8443, giving `https://192.168.20.3:8443/` for this example.
 
 To download the Boxedwine browser runtime and package the game without starting the server, open PowerShell in the repository and run this command.
 

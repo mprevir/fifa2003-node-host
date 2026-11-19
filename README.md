@@ -73,16 +73,15 @@ On Linux, macOS, or Windows, use a Chromium-based browser such as Chrome, Chromi
 ## 4. Play a friendly
 
 1. Click inside the game and press Enter at the title screen. Press a face button on your gamepad and check that its name appears above the game.
-<img width="1280" height="800" alt="photo_2026-11-19_08-40-36" src="https://github.com/user-attachments/assets/e9bfd199-94ed-4e65-b15f-fd5d25eba332" />
+
+   <img width="1280" height="800" alt="photo_2026-11-19_08-40-36" src="https://github.com/user-attachments/assets/e9bfd199-94ed-4e65-b15f-fd5d25eba332" />
+
 2. Use the mouse to select **Play a Club Championship Friendly**. At **Select Sides**, use the keyboard arrows and the gamepad's left stick or D-pad to assign the two device icons. The launcher supports one browser gamepad plus the keyboard.
 3. Start the match. Use the arrow keys to move, **S** to pass, **A** for a long ball, **D** to shoot, **W** to cross, and **Esc** to pause. See **Control Options** for the gamepad mappings.
 
-<img width="1280" height="800" alt="photo_2026-11-19_08-40-58" src="https://github.com/user-attachments/assets/30929fca-af7b-4450-bda4-f6b0f37d3e17" />
-
+   <img width="1280" height="800" alt="photo_2026-11-19_08-40-58" src="https://github.com/user-attachments/assets/30929fca-af7b-4450-bda4-f6b0f37d3e17" />
 
 If the game is choppy, check WebGL hardware acceleration at `chrome://gpu` or `edge://gpu`.
-
-
 
 ## Controller files
 

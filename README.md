@@ -28,7 +28,7 @@ caddy_path =
 ```
 
 - `game_dir` is the installed game folder. Absolute paths and paths relative to the configuration file both work.
-- `lan_ip` is the Windows host's IPv4 address on the same network as the client. Leave it blank to play on the host itself.
+- `lan_ip` is the Windows host's IPv4 address on the same network as the client. Leave it blank to play on the host itself. Also you can use VLAN tools like Hamachi, ZeroTier, etc. to create a virtual LAN and play over the Internet
 - `caddy_path` can point to a portable `caddy.exe`. Leave it blank to find Caddy on PATH.
 
 ## 2. Start the host

@@ -1,5 +1,5 @@
-"""Stage the local Build 325 installation for Boxedwine (Python 3.11+)."""
-import argparse
+"""Prepare the configured FIFA installation for Boxedwine (Python 3.11+)."""
+import configparser
 import hashlib
 import json
 import re
@@ -10,13 +10,26 @@ from pathlib import Path
 from tempfile import NamedTemporaryFile
 
 HERE = Path(__file__).resolve().parent
-STAGE = HERE / "stage"
+CONFIG = HERE / "fifa-host.cfg"
+WEB_FILES = HERE / ".fifa-runtime"
 CONTROLLER = HERE / "controller"
 XIDI = CONTROLLER / "xidi"
 LOCK = json.loads((HERE / "runtime-lock.json").read_text(encoding="utf-8"))
 BUILD = "https://boxedwine.org/builds/demos/build/master/138/st-jit/"
-EXE_HASH = "dff7f9ae1c6ebe6a73f90013e06ebca8453daa101587a9b7bb7bf51aa2149889"
 EXCLUDE = {"d3d8.dll", "ddraw.dll", "dgvoodoo.conf"}
+
+
+def read_settings():
+    parser = configparser.ConfigParser(interpolation=None)
+    if not parser.read(CONFIG, encoding="utf-8-sig"):
+        raise ValueError("Copy fifa-host.example.cfg to fifa-host.cfg and set game_dir.")
+    if not parser.has_section("host"):
+        raise ValueError("Add the [host] section to fifa-host.cfg.")
+    return parser["host"]
+
+
+def configured_path(value):
+    return (CONFIG.parent / Path(value).expanduser()).resolve()
 
 
 def digest(path):
@@ -25,10 +38,10 @@ def digest(path):
 
 
 def fetch(name, url, pin):
-    path = STAGE / name
+    path = WEB_FILES / name
     if path.exists() and digest(path) == pin:
         return
-    with NamedTemporaryFile(dir=STAGE, delete=False) as temp:
+    with NamedTemporaryFile(dir=WEB_FILES, delete=False) as temp:
         partial = Path(temp.name)
     try:
         with urllib.request.urlopen(url, timeout=120) as response, partial.open("wb") as output:
@@ -43,7 +56,7 @@ def fetch(name, url, pin):
 def game_config(path):
     config = path.read_bytes()
     for name, value in [(b"VIDEO", b"0"), (b"AUDIO", b"1")]:
-        pattern = rb"^(" + name + rb"[ \t]*=[ \t]*)\d+(?=[ \t]*\r?$)"
+        pattern = rb"^([ \t]*" + name + rb"[ \t]*=[ \t]*)\d+(?=[ \t]*(?://[^\r\n]*)?\r?$)"
         config, count = re.subn(pattern, lambda match: match[1] + value, config, flags=re.M | re.I)
         if count != 1:
             raise ValueError(f"Expected exactly one {name.decode()} setting in {path}")
@@ -52,8 +65,8 @@ def game_config(path):
 
 def pack_game(game):
     executable = game / "fifa2003.exe"
-    if not executable.is_file() or digest(executable) != EXE_HASH:
-        raise ValueError(f"Expected the supported Build 325 executable at {executable}")
+    if not executable.is_file():
+        raise ValueError(f"Could not find {executable}. Set game_dir to the installed FIFA folder.")
     config = game_config(game / "soccer.ini")
     data = game / "data"
     if not data.is_dir() or not any(data.iterdir()):
@@ -68,7 +81,7 @@ def pack_game(game):
     for notice in sorted((XIDI / "ThirdParty").iterdir()):
         overlays[f"Xidi-licenses/{notice.name}"] = notice
     excluded = EXCLUDE | {"soccer.ini"} | {name.lower() for name in overlays}
-    with NamedTemporaryFile(dir=STAGE, delete=False) as temp:
+    with NamedTemporaryFile(dir=WEB_FILES, delete=False) as temp:
         partial = Path(temp.name)
     try:
         with zipfile.ZipFile(partial, "w", zipfile.ZIP_DEFLATED, compresslevel=1) as archive:
@@ -83,39 +96,44 @@ def pack_game(game):
             bad = archive.testzip()
             if bad:
                 raise ValueError(f"Failed CRC check for {bad}")
-        partial.replace(STAGE / "fifa325-pad.zip")
-        print("fifa325-pad.zip SHA-256", digest(STAGE / "fifa325-pad.zip"))
+        # Boxedwine uses the ZIP name to look up existing browser saves.
+        partial.replace(WEB_FILES / "fifa325-pad.zip")
     finally:
         partial.unlink(missing_ok=True)
 
 
-def stage_launcher():
-    stock = (STAGE / "boxedwine.html").read_text(encoding="utf-8")
+def write_launcher():
+    stock = (WEB_FILES / "boxedwine.html").read_text(encoding="utf-8")
     marker = "<script src=boxedwine-shell.js>"
     if stock.count(marker) != 1:
         raise ValueError("Unexpected Boxedwine launcher HTML")
     page = stock.replace(marker, '<script src="gamepad.js"></script>' + marker)
-    (STAGE / "fifa.html").write_text(page, encoding="utf-8")
+    (WEB_FILES / "fifa.html").write_text(page, encoding="utf-8")
     for name in ("index.html", "gamepad.js"):
-        shutil.copyfile(HERE / name, STAGE / name)
+        shutil.copyfile(HERE / name, WEB_FILES / name)
 
 
-def main():
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--game-dir", type=Path, default=HERE / "playtest",
-                        help="Build 325 installation directory (default: local playtest/)")
-    game = parser.parse_args().game_dir.resolve()
-    if STAGE.resolve().is_relative_to(game):
-        parser.error("the stage directory must be outside the input game directory")
+def prepare(settings):
+    game_dir = settings.get("game_dir", "").strip()
+    if not game_dir:
+        raise ValueError("Set game_dir in fifa-host.cfg to the installed FIFA folder.")
+    game = configured_path(game_dir)
+    output = WEB_FILES.resolve()
+    if output.is_relative_to(game) or game.is_relative_to(output):
+        raise ValueError("Choose a game directory outside the host's generated files.")
 
-    STAGE.mkdir(exist_ok=True)
+    WEB_FILES.mkdir(exist_ok=True)
+    print(f"Preparing FIFA from {game}", flush=True)
     pack_game(game)
     for name, metadata in LOCK["runtime"].items():
         fetch(name, BUILD + name, metadata["sha256"])
     fetch("boxedwine.zip", "https://boxedwine.org/v2/41/TinyCore15Wine11.0-web.zip",
           LOCK["filesystem"]["archive"]["sha256"])
-    stage_launcher()
+    write_launcher()
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        prepare(read_settings())
+    except (OSError, ValueError, configparser.Error) as error:
+        raise SystemExit(str(error)) from error

@@ -156,10 +156,15 @@ vite.config.ts.timestamp-*
 .nx/workspace-data
 .nx/migrate-runs
 
-# Local FIFA installation, generated web package, and portable host tools
+# Local host settings, generated files, and portable tools
+/fifa-host.cfg
+/.fifa-runtime/
+/game/
+/tools/
+
+# Local files from older setups
 /playtest/
 /stage/
-/tools/
 __pycache__/
 /controller/*.exp
 /controller/*.lib

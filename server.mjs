@@ -6,7 +6,7 @@ import { pipeline } from "node:stream";
 import { fileURLToPath } from "node:url";
 
 const scriptDir = dirname(fileURLToPath(import.meta.url));
-let root = join(scriptDir, "stage");
+let root = join(scriptDir, ".fifa-runtime");
 let port = 8325;
 let host = "127.0.0.1";
 const positional = [];
@@ -44,7 +44,7 @@ if (positional.length > 2) {
 
 const rootInfo = await stat(root).catch(() => null);
 if (!rootInfo?.isDirectory()) {
-    console.error(`Stage directory unavailable: ${root}. Run prepare.py or pass --root with a prepared directory.`);
+    console.error(`Game package directory unavailable: ${root}. Run python host.py to prepare and serve FIFA.`);
     process.exit(1);
 }
 
